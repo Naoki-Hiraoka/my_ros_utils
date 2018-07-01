@@ -1,0 +1,40 @@
+import rosbag
+
+temp_time=[]
+temp_data=[]
+eff_time=[]
+eff_data=[]
+
+bag = rosbag.Bag("rosbag_2018-06-13-19-00-54_66.bag")
+#bag = rosbag.Bag("append.bag")
+
+startsec=-1
+try:
+    for topic, msg, t in bag.read_messages(topics=['/motor_states',"/joint_states_appended"]):
+        if startsec<0:
+            startsec=t.secs
+        if topic == "/joint_states_appended":
+            if len(msg.effort)==12:
+                continue
+            eff_time.append(t.secs-startsec+t.nsecs*0.000000001)
+            eff_data.append(msg.position[16])
+            temp_time.append(t.secs-startsec+t.nsecs*0.000000001)
+            temp_data.append(msg.position[18])
+            #eff_data.append(msg.effort[18])
+        #if topic == "/motor_states":
+        #    temp_time.append(t.secs-startsec+t.nsecs*0.000000001)
+        #    temp_data.append(msg.temperature[4])
+        #    #temp_data.append(msg.temperature[6])
+            
+finally:
+    bag.close()
+    import Gnuplot
+    #td=Gnuplot.Data(temp_time,temp_data,title="temperature")
+    td=Gnuplot.Data(temp_time,temp_data,title="RLEGJOINT4")
+    ed=Gnuplot.Data(eff_time,eff_data,title="RLEGJOINT6")
+    gp=Gnuplot.Gnuplot(persist=1)
+    gp("set style data lines")
+    #gp.plot(td,ed,title="180426 RLEGJOINT4",xlabel="time(11:21AM-21:16PM)",ylabel="temperature(deg), effort(Nm)")
+    gp.plot(td,ed,title="180501 JOINTPOSITION",xlabel="time(5:10PM-5:15PM)",ylabel="position(deg)")
+    
+
