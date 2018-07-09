@@ -19,6 +19,9 @@ title = rospy.get_param("~title",None)
 xlabel = rospy.get_param("~xlabel",None)
 ylabel = rospy.get_param("~ylabel",None)
 
+x_range = rospy.get_param("~xrange",None)
+y_range = rospy.get_param("~yrange",None)
+
 if len(data) != len(titles):
     titles = data
 topics = []
@@ -58,7 +61,7 @@ try:
             num+=1
             if num<20:
                 print index, "msg"+topicdata[index],eval("msg"+topicdata[index])
-                print graph_data
+                #print graph_data
 finally:
     bag.close()
     import Gnuplot
@@ -66,7 +69,14 @@ finally:
     for i in range(len(data)):
         plot_data.append(Gnuplot.Data(graph_time[i],graph_data[i],title=titles[i]))
     gp=Gnuplot.Gnuplot(persist=1)
+    if x_range:
+        tmp_str="gp(\"set xr["+str(x_range[0])+":"+str(x_range[1])+"]\")"
+        exec(tmp_str)
+    if y_range:
+        tmp_str="gp(\"set yr["+str(y_range[0])+":"+str(y_range[1])+"]\")"
+        exec(tmp_str)
     gp("set style data lines")
+    gp("set xlabel font 'Times 40'")
     tmp_str="gp.plot("
     for i in range(len(plot_data)):
         tmp_str += "plot_data[" + str(i) + "],"
