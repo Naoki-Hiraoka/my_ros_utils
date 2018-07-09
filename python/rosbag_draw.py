@@ -10,6 +10,10 @@ rospy.init_node("rosbag_draw",anonymous=True)
 filename = rospy.get_param("~filename",None)
 data = rospy.get_param("~data",[])
 titles = rospy.get_param("~titles",data)
+scales = rospy.get_param("~scales",[1]*len(data))
+
+start = rospy.get_param("~start",0)
+end = rospy.get_param("~end",float("inf"))
 
 title = rospy.get_param("~title",None)
 xlabel = rospy.get_param("~xlabel",None)
@@ -21,7 +25,7 @@ topics = []
 topicdata = []
 print data
 for _data in data:
-    print _data.find("/",1)
+    #print _data.find("/",1)
     if _data.find("/",1):
         topics.append(_data[:_data.find("/",1)])
         topicdata.append(_data[_data.find("/",1):].replace("/",".").replace("(","[").replace(")","]"))
@@ -42,13 +46,19 @@ try:
     for topic, msg, t in bag.read_messages(topics=topics):
         if startsec<0:
             startsec=t.secs
-        index=topics.index(topic)
-        graph_time[index].append(t.secs-startsec+t.nsecs*0.000000001)
-        graph_data[index].append(eval("msg"+topicdata[index]))
-        num+=1
-        if num<20:
-            print index, "msg"+topicdata[index],eval("msg"+topicdata[index])
-            print graph_data
+        if (t.secs-startsec+t.nsecs*0.000000001) < start:
+            continue
+        if (t.secs-startsec+t.nsecs*0.000000001) > end:
+            break
+        index=-1
+        while (topic in topics[index+1:]):
+            index=index+1+topics[index+1:].index(topic)
+            graph_time[index].append(t.secs-startsec+t.nsecs*0.000000001)
+            graph_data[index].append(eval("msg"+topicdata[index]) * scales[index])
+            num+=1
+            if num<20:
+                print index, "msg"+topicdata[index],eval("msg"+topicdata[index])
+                print graph_data
 finally:
     bag.close()
     import Gnuplot
