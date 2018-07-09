@@ -22,6 +22,8 @@ ylabel = rospy.get_param("~ylabel",None)
 x_range = rospy.get_param("~xrange",None)
 y_range = rospy.get_param("~yrange",None)
 
+size = rospy.get_param("~size",None)
+
 if len(data) != len(titles):
     titles = data
 topics = []
@@ -76,7 +78,15 @@ finally:
         tmp_str="gp(\"set yr["+str(y_range[0])+":"+str(y_range[1])+"]\")"
         exec(tmp_str)
     gp("set style data lines")
-    gp("set xlabel font 'Times 40'")
+    if size:
+        tmp_str="gp(\"set tics font 'Times,"+str(size)+"'\")"
+        exec(tmp_str)
+        tmp_str="gp(\"set xlabel font 'Times,"+str(size)+"'\")"
+        exec(tmp_str)
+        tmp_str="gp(\"set ylabel font 'Times,"+str(size)+"'\")"
+        exec(tmp_str)
+        tmp_str="gp(\"set title font 'Times,"+str(size)+"'\")"
+        exec(tmp_str)
     tmp_str="gp.plot("
     for i in range(len(plot_data)):
         tmp_str += "plot_data[" + str(i) + "],"
