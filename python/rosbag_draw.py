@@ -23,6 +23,7 @@ x_range = rospy.get_param("~xrange",None)
 y_range = rospy.get_param("~yrange",None)
 
 size = rospy.get_param("~size",None)
+keypos = rospy.get_param("~keypos",None) #left top
 
 if len(data) != len(titles):
     titles = data
@@ -86,6 +87,11 @@ finally:
         tmp_str="gp(\"set ylabel font 'Times,"+str(size)+"'\")"
         exec(tmp_str)
         tmp_str="gp(\"set title font 'Times,"+str(size)+"'\")"
+        exec(tmp_str)
+        tmp_str="gp(\"set key font 'Times,"+str(size)+"'\")"
+        exec(tmp_str)
+    if keypos:
+        tmp_str="gp(\"set key "+keypos+"\")"
         exec(tmp_str)
     tmp_str="gp.plot("
     for i in range(len(plot_data)):
