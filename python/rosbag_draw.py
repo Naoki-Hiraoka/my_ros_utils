@@ -72,6 +72,7 @@ finally:
     for i in range(len(data)):
         plot_data.append(Gnuplot.Data(graph_time[i],graph_data[i],title=titles[i]))
     gp=Gnuplot.Gnuplot(persist=1)
+    gp("set grid")
     if x_range:
         tmp_str="gp(\"set xr["+str(x_range[0])+":"+str(x_range[1])+"]\")"
         exec(tmp_str)
@@ -79,6 +80,7 @@ finally:
         tmp_str="gp(\"set yr["+str(y_range[0])+":"+str(y_range[1])+"]\")"
         exec(tmp_str)
     gp("set style data lines")
+    gp("set key opaque box")
     if size:
         tmp_str="gp(\"set tics font 'Times,"+str(size)+"'\")"
         exec(tmp_str)
